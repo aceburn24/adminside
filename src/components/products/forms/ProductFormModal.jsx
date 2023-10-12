@@ -83,10 +83,19 @@ const ProductFormModal = ({ show, handleClose }) => {
     }
 
     const response = await submitForm(url, mainForm);
-    if (!response || !response.id) {
+
+    let productId;
+    if (response && response.id) {
+      productId = response.id;
+    } else if (response && response.data && response.data.id) {
+      productId = response.data.id;
+    }
+    
+    if (!productId) {
       setErrorMessage('Failed to create main product. Cannot proceed.');
       return;
     }
+    
 
     // Step 2: Submit Variants (Only for shoes)
     if (productType === 'shoe') {

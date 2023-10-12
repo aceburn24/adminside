@@ -1,64 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Row, Col, Card, Tooltip, OverlayTrigger, Spinner } from 'react-bootstrap';
+import { Form, Button, Row, Col, Card, Tooltip, OverlayTrigger, FormControl } from 'react-bootstrap';
 import { useDropzone } from 'react-dropzone';
 
 const AccessoryForm = ({ formData, handleChange, handleMainImageChange, handleVariantImages }) => {
-  const [additionalImagePreviews, setAdditionalImagePreviews] = useState([]); // Add this line
-  const { getRootProps, getInputProps } = useDropzone({ 
-    accept: 'image/*', 
-    onDrop: acceptedFiles => {
-      handleVariantImages(acceptedFiles);
-      setAdditionalImagePreviews(prev => [...prev, ...acceptedFiles.map(file => URL.createObjectURL(file))]);
-    }
-  });
-  useEffect(() => {
-    // Revoke object URLs to free up memory
-    return () => {
-      additionalImagePreviews.forEach(URL.revokeObjectURL);
-    };
-  }, [additionalImagePreviews]);
-  
+  const [additionalImagePreviews, setAdditionalImagePreviews] = useState([]);
   const [mainImagePreview, setMainImagePreview] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState('');
+
+  // Remove a main image preview
+  const removeMainImagePreview = () => {
+    setMainImagePreview(null);
+  };
+
+  // Remove an additional image preview
+  const removeAdditionalImagePreview = (indexToRemove) => {
+    setAdditionalImagePreviews(prev => prev.filter((_, index) => index !== indexToRemove));
+  };
+
+  const [validation] = useState({
+    name: true,
+    price: true,
+    stock: true,
+  });
 
   const renderTooltip = (props) => (
     <Tooltip id="button-tooltip" {...props}>
       This is a required field.
     </Tooltip>
   );
-
-  const capitalizeFirstLetter = (string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  };
-
-  const [validation, setValidation] = useState({
-    name: true,
-    price: true,
-    stock: true,
-  });
-
-  const validate = () => {
-    const newValidation = {
-      name: formData.name !== '',
-      price: formData.price >= 1,
-      stock: formData.stock >= 0,
-    };
-
-    setValidation(newValidation);
-
-    return Object.values(newValidation).every(Boolean);
-  };
-
-  const handleSubmit = () => {
-    if (validate()) {
-      setIsLoading(true);
-      setTimeout(() => {
-        setIsLoading(false);
-        setMessage('Form submitted successfully!');
-      }, 2000);
-    }
-  };
 
   const handleImagePreview = (e) => {
     const file = e.target.files[0];
@@ -74,12 +42,24 @@ const AccessoryForm = ({ formData, handleChange, handleMainImageChange, handleVa
     }
   };
 
+  const { getRootProps, getInputProps } = useDropzone({ 
+    accept: 'image/*', 
+    onDrop: acceptedFiles => {
+      handleVariantImages(acceptedFiles);
+      setAdditionalImagePreviews(prev => [...prev, ...acceptedFiles.map(file => URL.createObjectURL(file))]);
+    }
+  });
+
+  useEffect(() => {
+    return () => {
+      additionalImagePreviews.forEach(URL.revokeObjectURL);
+    };
+  }, [additionalImagePreviews]);;
+
   return (
     <>
-      {isLoading ? <Spinner animation="border" variant="primary" /> : null}
-      {message && <div className="alert alert-success">{capitalizeFirstLetter(message)}</div>}
-      <Form onSubmit={handleSubmit}>
-      <Card className="mb-4" style={{ marginTop: '20px' }}>
+      <Form>
+        <Card className="mb-4" style={{ marginTop: '20px' }}>
           <Card.Header>Basic Information</Card.Header>
           <Card.Body>
             <Row>
@@ -87,7 +67,7 @@ const AccessoryForm = ({ formData, handleChange, handleMainImageChange, handleVa
                 <Form.Group>
                   <Form.Label>Name</Form.Label>
                   <OverlayTrigger placement="right" overlay={renderTooltip}>
-                    <Form.Control 
+                    <FormControl 
                       type="text" 
                       name="name" 
                       value={formData.name} 
@@ -102,7 +82,7 @@ const AccessoryForm = ({ formData, handleChange, handleMainImageChange, handleVa
               <Col md={3}>
                 <Form.Group>
                   <Form.Label>Description</Form.Label>
-                  <Form.Control 
+                  <FormControl 
                     type="text" 
                     name="description" 
                     value={formData.description} 
@@ -113,7 +93,7 @@ const AccessoryForm = ({ formData, handleChange, handleMainImageChange, handleVa
               <Col md={3}>
                 <Form.Group>
                   <Form.Label>Price</Form.Label>
-                  <Form.Control 
+                  <FormControl 
                     type="number" 
                     name="price" 
                     value={formData.price} 
@@ -126,7 +106,7 @@ const AccessoryForm = ({ formData, handleChange, handleMainImageChange, handleVa
               <Col md={3}>
                 <Form.Group>
                   <Form.Label>Category</Form.Label>
-                  <Form.Control 
+                  <FormControl 
                     type="text" 
                     name="category" 
                     value={formData.category} 
@@ -139,83 +119,90 @@ const AccessoryForm = ({ formData, handleChange, handleMainImageChange, handleVa
         </Card>
 
         <Card className="mb-4">
-          <Card.Header>Additional Information</Card.Header>
-          <Card.Body>
-            <Row>
-              <Col md={3}>
-                <Form.Group>
-                  <Form.Label>Brand Name</Form.Label>
-                  <Form.Control 
-                    type="text" 
-                    name="brand_name" 
-                    value={formData.brand_name} 
-                    onChange={handleChange} 
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={3}>
-                <Form.Group>
-                  <Form.Label>Stock</Form.Label>
-                  <Form.Control 
-                    type="number" 
-                    name="stock" 
-                    value={formData.stock} 
-                    onChange={handleChange} 
-                    isInvalid={!validation.stock}
-                  />
-                  <Form.Control.Feedback type="invalid">Stock cannot be negative.</Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-              <Col md={3}>
-                <Form.Group>
-                  <Form.Label>Main Image</Form.Label>
-                  <OverlayTrigger placement="right" overlay={renderTooltip}>
-                    <div>
-                      <input 
-                        type="file"
-                        id="fileInput"
-                        name="mainImage"
-                        onChange={handleImagePreview}
-                        style={{ display: 'none' }}
-                        required
-                      />
-                      <label htmlFor="fileInput" className="btn btn-outline-secondary">
-                        Choose File
-                      </label>
-                      <span id="fileLabel">
-                        {formData.mainImage ? formData.mainImage.name : 'No file'}
-                      </span>
-                    </div>
-                  </OverlayTrigger>
-                  {mainImagePreview && <img src={mainImagePreview} alt="Main Preview" width="100" />}
-                </Form.Group>
-              </Col>
-
-            </Row>
-          </Card.Body>
+            <Card.Header>Additional Information</Card.Header>
+            <Card.Body>
+                <Row>
+                    <Col md={3}>
+                        <Form.Group>
+                            <Form.Label>Brand Name</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="brand_name"
+                                value={formData.brand_name}
+                                onChange={handleChange}
+                            />
+                        </Form.Group>
+                    </Col>
+                    <Col md={3}>
+                        <Form.Group>
+                            <Form.Label>Stock</Form.Label>
+                            <Form.Control
+                                type="number"
+                                name="stock"
+                                value={formData.stock}
+                                onChange={handleChange}
+                                isInvalid={!validation.stock}
+                            />
+                            <Form.Control.Feedback type="invalid">Stock cannot be negative.</Form.Control.Feedback>
+                        </Form.Group>
+                    </Col>
+                    <Col md={3}>
+                        <Form.Group>
+                            <Form.Label>Main Image</Form.Label>
+                            <OverlayTrigger placement="right" overlay={renderTooltip}>
+                                <div>
+                                    <input 
+                                        type="file"
+                                        id="fileInput"
+                                        name="mainImage"
+                                        onChange={handleImagePreview}
+                                        style={{ display: 'none' }}
+                                        required
+                                    />
+                                    <label htmlFor="fileInput" className="btn btn-outline-secondary">
+                                        Choose File
+                                    </label>
+                                    <span id="fileLabel">
+                                        {formData.mainImage ? formData.mainImage.name : 'No file'}
+                                    </span>
+                                </div>
+                            </OverlayTrigger>
+                            {mainImagePreview && 
+                                <div style={{ position: 'relative', display: 'inline-block' }}>
+                                    <img src={mainImagePreview} alt="Main Preview" width="100" style={{ margin: '10px' }} />
+                                    <Button variant="danger" size="sm" style={{ position: 'absolute', right: 0, top: 0 }} onClick={removeMainImagePreview}>X</Button>
+                                </div>
+                            }
+                        </Form.Group>
+                    </Col>
+                </Row>
+            </Card.Body>
         </Card>
 
+        {/* Additional Images Dropzone */}
         <Form.Group className="mb-4">
-        <div {...getRootProps()}>
-          <input {...getInputProps()} />
-          <p>Drag 'n' drop additional images here, or click to select files</p>
-          <Button variant="outline-secondary">Upload Additional Images</Button>
-        </div>
-        {/* Preview the uploaded images */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', marginTop: '16px' }}>
-          {additionalImagePreviews.map((src, index) => (
-            <img 
-              key={index} 
-              src={src} 
-              alt={`Preview ${index}`} 
-              style={{ width: '100px', height: '100px', objectFit: 'cover', margin: '8px' }}
-            />
-          ))}
-        </div>
-      </Form.Group>
+            <div {...getRootProps()}>
+                <input {...getInputProps()} />
+                <p>Drag 'n' drop additional images here, or click to select files</p>
+                <Button variant="outline-secondary">Upload Additional Images</Button>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', marginTop: '16px' }}>
+                {additionalImagePreviews.map((src, index) => (
+                    <div key={index} style={{ position: 'relative', display: 'inline-block' }}>
+                        <img 
+                            src={src} 
+                            alt={`Preview ${index}`} 
+                            style={{ width: '100px', height: '100px', objectFit: 'cover', margin: '8px' }}
+                        />
+                        <Button variant="danger" size="sm" style={{ position: 'absolute', right: 0, top: 0 }} onClick={() => removeAdditionalImagePreview(index)}>X</Button>
+                    </div>
+                ))}
+            </div>
+        </Form.Group>
       </Form>
     </>
-  );
+);
+
 };
 
 export default AccessoryForm;
