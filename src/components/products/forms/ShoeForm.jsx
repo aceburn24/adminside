@@ -2,9 +2,33 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Form, Button, Row, Col, Card, Tooltip, OverlayTrigger, Spinner, FormControl } from 'react-bootstrap';
 import { useDropzone } from 'react-dropzone';
 
-const ShoeForm = ({ formData, handleChange, handleMainImageChange, handleVariantImages }) => {
-  const { getRootProps, getInputProps } = useDropzone({ accept: 'image/*', onDrop: handleVariantImages });
-  const [variants, setVariants] = useState([{ color: '', size: '', stock: '' }]);
+const ShoeForm = ({ formData, handleChange, handleMainImageChange, handleVariantImages, variants, setVariants, variantImages, setVariantImages }) => {
+  const [variantImagePreviews, setVariantImagePreviews] = useState([]);
+    // Remove a main image preview
+  const removeMainImagePreview = () => {
+    setMainImagePreview(null);
+  };
+
+    // Remove a variant image preview
+  const removeVariantImagePreview = (indexToRemove) => {
+    setVariantImagePreviews(prev => prev.filter((_, index) => index !== indexToRemove));
+    setVariantImages(prev => prev.filter((_, index) => index !== indexToRemove));
+  };
+
+  const { getRootProps, getInputProps } = useDropzone({ 
+    accept: 'image/*', 
+    onDrop: acceptedFiles => {
+      handleVariantImages(acceptedFiles);
+      setVariantImagePreviews(prev => [...prev, ...acceptedFiles.map(file => URL.createObjectURL(file))]);
+    }
+  });
+
+  useEffect(() => {
+    return () => {
+      variantImagePreviews.forEach(URL.revokeObjectURL);
+    };
+  }, [variantImagePreviews]);
+
   const [mainImagePreview, setMainImagePreview] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -13,6 +37,15 @@ const ShoeForm = ({ formData, handleChange, handleMainImageChange, handleVariant
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
   
+  const handleChangeForVariants = (e, index) => {
+    const { name, value } = e.target;
+    setVariants(prevVariants => {
+      const newVariants = [...prevVariants];
+      newVariants[index][name] = value;
+      return newVariants;
+    });
+  };
+
   const [validation, setValidation] = useState({
     name: true,
     price: true,
@@ -21,7 +54,7 @@ const ShoeForm = ({ formData, handleChange, handleMainImageChange, handleVariant
 
   const addVariant = useCallback(() => {
     setVariants(prevVariants => [...prevVariants, { color: '', size: '', stock: '' }]);
-  }, []);  
+  }, [setVariants]);  
 
   useEffect(() => {
     if (variants.length === 0) {
@@ -168,7 +201,13 @@ const ShoeForm = ({ formData, handleChange, handleMainImageChange, handleVariant
                   <OverlayTrigger placement="right" overlay={renderTooltip}>
                     <Form.Control type="file" name="mainImage" onChange={handleImagePreview} required />
                   </OverlayTrigger>
-                  {mainImagePreview && <img src={mainImagePreview} alt="Main Preview" width="100" />}
+                  <div style={{ height: '10px' }}></div> 
+                  {mainImagePreview && 
+                    <div style={{ position: 'relative', display: 'inline-block' }}>
+                      <img src={mainImagePreview} alt="Main Preview" width="100" style={{ margin: '10px' }} />
+                      <Button variant="danger" size="sm" style={{ position: 'absolute', right: 0, top: 0 }} onClick={removeMainImagePreview}>X</Button>
+                    </div>
+                  }
                 </Form.Group>
               </Col>
             </Row>
@@ -183,13 +222,23 @@ const ShoeForm = ({ formData, handleChange, handleMainImageChange, handleVariant
               <Col md={3}>
                 <Form.Group className="mb-0">
                   <Form.Label>Color</Form.Label>
-                  <Form.Control type="text" name="color" value={variant.color} onChange={e => handleChange(e, index)} />
+                  <Form.Control 
+                    type="text" 
+                    name="color" 
+                    value={variant.color} 
+                    onChange={e => handleChangeForVariants(e, index)} 
+                  />
                 </Form.Group>
               </Col>
               <Col md={3}>
                 <Form.Group className="mb-0">
                   <Form.Label>Size</Form.Label>
-                  <Form.Control type="text" name="size" value={variant.size} onChange={e => handleChange(e, index)} />
+                  <Form.Control 
+                    type="text" 
+                    name="size" 
+                    value={variant.size} 
+                    onChange={e => handleChangeForVariants(e, index)} 
+                  />
                 </Form.Group>
               </Col>
               <Col md={3}>
@@ -199,7 +248,7 @@ const ShoeForm = ({ formData, handleChange, handleMainImageChange, handleVariant
                     type="number" 
                     name="stock" 
                     value={variant.stock} 
-                    onChange={e => handleChange(e, index)} 
+                    onChange={e => handleChangeForVariants(e, index)} 
                     isInvalid={!validation.stock}
                   />
                   <Form.Control.Feedback type="invalid">Stock cannot be negative.</Form.Control.Feedback>
@@ -220,13 +269,26 @@ const ShoeForm = ({ formData, handleChange, handleMainImageChange, handleVariant
       </Card>
 
 
-        {/* Dropzone for variant images */}
+       {/* Dropzone for variant images */}
         <Form.Group className="mb-4">
           <div {...getRootProps()}>
             <input {...getInputProps()} />
             <p>Drag 'n' drop the Variant Images here, or click to select files</p>
             <Button variant="outline-secondary">Upload Variant Images</Button>
           </div>
+       {/* Preview the uploaded images */}
+       <div style={{ display: 'flex', flexWrap: 'wrap', marginTop: '16px' }}>
+          {variantImagePreviews.map((src, index) => (
+            <div key={index} style={{ position: 'relative', display: 'inline-block' }}>
+              <img 
+                src={src} 
+                alt={`Preview ${index}`} 
+                style={{ width: '100px', height: '100px', objectFit: 'cover', margin: '8px' }}
+              />
+              <Button variant="danger" size="sm" style={{ position: 'absolute', right: 0, top: 0 }} onClick={() => removeVariantImagePreview(index)}>X</Button>
+            </div>
+          ))}
+        </div>
         </Form.Group>
 
         {/* Submit Button in ProductFormModal, as mentioned */}

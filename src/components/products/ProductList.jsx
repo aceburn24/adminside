@@ -20,7 +20,6 @@ function ProductList() {
   const [sortOptions, setSortOptions] = useState({ field: 'name', order: 'asc' });
   const [showForm, setShowForm] = useState(false);
 
-
     // Fetch data function using useCallback
     const fetchData = useCallback(() => {
         setIsLoading(true);

@@ -1,9 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Button, Row, Col, Card, Tooltip, OverlayTrigger, Spinner } from 'react-bootstrap';
 import { useDropzone } from 'react-dropzone';
 
 const AccessoryForm = ({ formData, handleChange, handleMainImageChange, handleVariantImages }) => {
-  const { getRootProps, getInputProps } = useDropzone({ accept: 'image/*', onDrop: handleVariantImages });
+  const [additionalImagePreviews, setAdditionalImagePreviews] = useState([]); // Add this line
+  const { getRootProps, getInputProps } = useDropzone({ 
+    accept: 'image/*', 
+    onDrop: acceptedFiles => {
+      handleVariantImages(acceptedFiles);
+      setAdditionalImagePreviews(prev => [...prev, ...acceptedFiles.map(file => URL.createObjectURL(file))]);
+    }
+  });
+  useEffect(() => {
+    // Revoke object URLs to free up memory
+    return () => {
+      additionalImagePreviews.forEach(URL.revokeObjectURL);
+    };
+  }, [additionalImagePreviews]);
+  
   const [mainImagePreview, setMainImagePreview] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -182,12 +196,23 @@ const AccessoryForm = ({ formData, handleChange, handleMainImageChange, handleVa
         </Card>
 
         <Form.Group className="mb-4">
-          <div {...getRootProps()}>
-            <input {...getInputProps()} />
-            <p>Drag 'n' drop additional images here, or click to select files</p>
-            <Button variant="outline-secondary">Upload Additional Images</Button>
-          </div>
-        </Form.Group>
+        <div {...getRootProps()}>
+          <input {...getInputProps()} />
+          <p>Drag 'n' drop additional images here, or click to select files</p>
+          <Button variant="outline-secondary">Upload Additional Images</Button>
+        </div>
+        {/* Preview the uploaded images */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', marginTop: '16px' }}>
+          {additionalImagePreviews.map((src, index) => (
+            <img 
+              key={index} 
+              src={src} 
+              alt={`Preview ${index}`} 
+              style={{ width: '100px', height: '100px', objectFit: 'cover', margin: '8px' }}
+            />
+          ))}
+        </div>
+      </Form.Group>
       </Form>
     </>
   );

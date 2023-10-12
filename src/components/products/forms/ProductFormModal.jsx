@@ -5,6 +5,8 @@ import ShoeForm from './ShoeForm';
 import AccessoryForm from './AccessoryForm';
 
 const ProductFormModal = ({ show, handleClose }) => {
+  const [errorMessage, setErrorMessage] = useState(null); // Define this only once
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [productType, setProductType] = useState('shoe');
   const [formData, setFormData] = useState({
     name: '',
@@ -19,6 +21,7 @@ const ProductFormModal = ({ show, handleClose }) => {
   });
   const [mainImage, setMainImage] = useState(null);
   const [variantImages, setVariantImages] = useState([]);
+  const [variants, setVariants] = useState([{ color: '', size: '', stock: '' }]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,90 +36,177 @@ const ProductFormModal = ({ show, handleClose }) => {
   };
 
   const handleVariantImages = (acceptedFiles) => {
-    setVariantImages(acceptedFiles);
-  };
+        setVariantImages(prev => [...prev, ...acceptedFiles]);
+    };    
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const baseUrl = 'http://localhost:8000/api';
-    const url = `${baseUrl}/${productType === 'shoe' ? 'shoes' : 'accessories'}`;
-    
-    const submitForm = async (url, form) => {
-      try {
-        return await axios.post(url, form, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-      } catch (error) {
-        console.error('There was a problem submitting your form!', error);
-        return null;
-      }
-    };
-    
-    const form = new FormData();
-    Object.keys(formData).forEach(key => {
-      form.append(key, formData[key]);
-    });
-    
-    form.append('image', mainImage);
-    
-    const response = await submitForm(url, form);
-    
-    if (response && productType === 'shoe' && variantImages.length > 0) {
-      const shoeId = response.data.id;
-      const variantUrl = `${baseUrl}/product_variants`;
+  const submitForm = async (url, form, isJson = false) => {
+    try {
+      const headers = isJson 
+        ? { 'Content-Type': 'application/json' } 
+        : { 'Content-Type': 'multipart/form-data' };
       
-      for (const image of variantImages) {
-        const variantForm = new FormData();
-        variantForm.append('shoe_id', shoeId);
-        variantForm.append('image', image);
-        
-        await submitForm(variantUrl, variantForm);
+      const response = await axios.post(url, form, { headers });
+      return response.data;
+  
+    } catch (error) {
+      console.error('There was a problem submitting your form!', error);
+      if (error.response && error.response.data && error.response.data.message) {
+        setErrorMessage(error.response.data.message);  // Displaying server error
+      } else {
+        setErrorMessage('Something went wrong. Please try again.');
       }
-    }
-    
-    if (response) {
-      handleClose();
+      return null;
     }
   };
   
 
-  return (
-    <Modal show={show} onHide={handleClose} size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>Add New Product</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-            <DropdownButton id="dropdown-item-button" title="Select Product Type">
-              <Dropdown.Item as="button" onClick={() => setProductType('shoe')}>Shoe</Dropdown.Item>
-              <Dropdown.Item as="button" onClick={() => setProductType('accessory')}>Accessory</Dropdown.Item>
-            </DropdownButton>
-        <Form onSubmit={handleSubmit}>
-          {productType === 'shoe' ? ( 
-            
-            <ShoeForm 
-              formData={formData} 
-              handleChange={handleChange} 
-              handleMainImageChange={handleMainImageChange} 
-              handleVariantImages={handleVariantImages} 
-            />
-          ) : (
-            <AccessoryForm 
-              formData={formData} 
-              handleChange={handleChange} 
-              handleMainImageChange={handleMainImageChange} 
-              handleVariantImages={handleVariantImages} 
-            />
-          )}
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log('Variants state at handleSubmit start:', variants);
 
-          <Button variant="primary" type="submit">
-            Submit
-          </Button>
-        </Form>
-      </Modal.Body>
-    </Modal>
+    const baseUrl = 'http://localhost:8000/api';
+    let url;
+
+    // Step 1: Submit Main Product
+    if (productType === 'shoe') {
+      url = `${baseUrl}/shoes`;
+    } else {
+      url = `${baseUrl}/accessories`;
+    }
+
+    const mainForm = new FormData();
+    Object.keys(formData).forEach(key => {
+      mainForm.append(key, formData[key]);
+    });
+    if (mainImage) {
+      mainForm.append('image', mainImage);
+    }
+
+    const response = await submitForm(url, mainForm);
+    if (!response || !response.id) {
+      setErrorMessage('Failed to create main product. Cannot proceed.');
+      return;
+    }
+
+    // Step 2: Submit Variants (Only for shoes)
+    if (productType === 'shoe') {
+      const shoeId = response.id;
+      for (let i = 0; i < variants.length; i++) {
+        const variantData = {
+          shoe_id: shoeId,
+          color: variants[i].color,
+          size: variants[i].size,  
+          stock: parseInt(variants[i].stock, 10)
+        };
+
+        console.log('Sending variant data:', variantData);
+        const variantResponse = await submitForm(
+          `${baseUrl}/variants`, 
+          JSON.stringify(variantData),
+          true  // Indicating that the content type is JSON
+        );
+
+        if (!variantResponse || !variantResponse.id) {
+          setErrorMessage(`Failed to create variant ${i + 1}.`);
+          return;
+        }
+      }
+    }
+
+    // Step 3: Submit Images (Polymorphic relationship)
+    const imageableId = response.id;
+    const imageableType = `App\\Models\\${productType.charAt(0).toUpperCase() + productType.slice(1)}`;
+    
+    console.log('Number of variant images to upload:', variantImages.length); // Check the number of images
+    
+    const imageForm = new FormData();
+    imageForm.append('imageable_id', imageableId);
+    imageForm.append('imageable_type', imageableType);
+    variantImages.forEach(image => {
+      imageForm.append('image_paths[]', image); // Append each image with the key 'image_paths[]'
+    });
+    
+    const imageResponse = await submitForm(`${baseUrl}/images`, imageForm);
+    console.log('Image Response:', imageResponse);
+    
+    if (!imageResponse || !imageResponse.images || imageResponse.images.length === 0) {
+        setErrorMessage('Failed to upload variant images.');
+        return;
+    }
+    
+   
+  
+    
+    
+
+    // If all steps are successful
+    handleClose();
+    setShowSuccessModal(true);
+  };
+
+  
+  
+  
+
+  return (
+    <>
+      <Modal show={show} onHide={handleClose} size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>Add New Product</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {/* Render error message */}
+          {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+          
+          <DropdownButton id="dropdown-item-button" title="Select Product Type">
+            <Dropdown.Item as="button" onClick={() => setProductType('shoe')}>Shoe</Dropdown.Item>
+            <Dropdown.Item as="button" onClick={() => setProductType('accessory')}>Accessory</Dropdown.Item>
+          </DropdownButton>
+          <Form onSubmit={handleSubmit}>
+            {productType === 'shoe' ? ( 
+              
+              <ShoeForm 
+                formData={formData} 
+                handleChange={handleChange} 
+                handleMainImageChange={handleMainImageChange} 
+                handleVariantImages={handleVariantImages}
+                variants={variants}
+                setVariants={setVariants}
+                variantImages={variantImages}
+                setVariantImages={setVariantImages}
+              />
+    
+            ) : (
+              <AccessoryForm 
+                formData={formData} 
+                handleChange={handleChange} 
+                handleMainImageChange={handleMainImageChange} 
+                handleVariantImages={handleVariantImages} 
+              />
+            )}
+    
+            <Button variant="primary" type="submit">
+              Submit
+            </Button>
+          </Form>
+        </Modal.Body>
+      </Modal>
+      
+      {/* Success Modal */}
+      <Modal show={showSuccessModal} onHide={() => setShowSuccessModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Success</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Product added successfully!
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowSuccessModal(false)}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+    </>
   );
+  
 };
 
 export default ProductFormModal;

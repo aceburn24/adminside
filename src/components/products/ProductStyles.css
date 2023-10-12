@@ -67,3 +67,16 @@
     background-color: #28a745 !important;
     color: white !important;
   }
+
+  .product-card img {
+    width: 100%; /* This ensures the image takes the full width of the card. */
+    height: 200px; /* Set this to whatever fixed height you prefer. */
+    object-fit: cover; /* This ensures the image covers the full width and height without stretching. */
+  }
+  
+  .modal-image {
+    width: 100%;  /* Full width */
+    height: 400px;  /* Desired fixed height */
+    object-fit: cover;  /* Cover the container without stretching */
+  }
+  

@@ -1,20 +1,16 @@
-import React, { useState, useEffect } from 'react';  // Added useEffect for side-effects
-import axios from 'axios';  // Added axios for API calls
+import React, { useState, useEffect } from 'react'; 
+import axios from 'axios'; 
 import { Modal, Carousel, Badge, Button } from 'react-bootstrap';
 
 const ProductModal = ({ show, handleClose, product, productType }) => {
-  // New state variable to hold fetched image variants
   const [imageVariants, setImageVariants] = useState([]);
 
-  // New useEffect to fetch image variants when the modal is shown
   useEffect(() => {
     if (show) {
-      // Determine the API URL based on productType (shoe or accessory)
       const url = productType === 'shoe'
         ? `http://localhost:8000/api/shoes/${product.id}/images`
         : `http://localhost:8000/api/accessories/${product.id}/images`;
 
-      // Fetch image variants from the API
       axios.get(url)
         .then(response => {
           setImageVariants(response.data);
@@ -23,7 +19,7 @@ const ProductModal = ({ show, handleClose, product, productType }) => {
           console.error('Error fetching image variants:', error);
         });
     }
-  }, [show, product, productType]);  // Dependencies for useEffect
+  }, [show, product, productType]);
 
   return (
     <Modal show={show} onHide={handleClose}>
@@ -31,25 +27,23 @@ const ProductModal = ({ show, handleClose, product, productType }) => {
         <Modal.Title>{product.name}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {/* Updated Carousel to display real image variants */}
-        <Carousel>
-          {imageVariants.map((image, index) => (
-            <Carousel.Item key={index}>
-              <img
-                className="d-block w-100"
-                src={image.image_path}
+      <Carousel>
+    {imageVariants.map((image, index) => (
+        <Carousel.Item key={index}>
+            <img
+                className="d-block w-100 modal-image"
+                src={`http://localhost:8000/storage/${image.image_path.split('/').pop()}`}
                 alt={`Variant ${index + 1}`}
-              />
-            </Carousel.Item>
-          ))}
-        </Carousel>
+            />
+        </Carousel.Item>
+    ))}
+</Carousel>
 
         {/* Rest of the existing code remains unchanged */}
         <p><strong>Description:</strong> {product.description}</p>
         <p><strong>Price:</strong> ₱{product.price}</p>
         <p><strong>Brand:</strong> {product.brand_name}</p>
 
-        {/* Product-specific details */}
         {productType === 'shoe' && (
           <>
             <p><strong>Type:</strong> {product.type}</p>
