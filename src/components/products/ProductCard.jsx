@@ -4,12 +4,15 @@ import { Card, Button, ButtonGroup, Badge, Tooltip, OverlayTrigger, Spinner } fr
 import { FaEdit, FaTrashAlt, FaEye } from 'react-icons/fa';
 import './ProductStyles.css';
 import ProductModal from './ProductModal';
+import ProductFormModal from './forms/ProductFormModal';
 
 function renderTooltip(props, message) {
   return <Tooltip {...props}>{message}</Tooltip>;
 }
 
 function ProductCard({ product, productType, isLoading, isError }) {
+  const [editProductData, setEditProductData] = useState(null);
+
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
@@ -39,9 +42,9 @@ const handleDelete = () => {
 
   // Edit product function (navigate to edit page)
   const handleEdit = () => {
-    console.log("Navigate to edit page for product:", product.id);
-    // Replace with your actual navigation logic (e.g., using React Router)
+    setEditProductData(product);
   };
+  
 
   if (isLoading) {
     return <Spinner animation="border" />;
@@ -108,10 +111,16 @@ const handleDelete = () => {
       <ProductModal 
       show={show} 
       handleClose={handleClose} 
-      product={product} 
+      product={editProductData || product} 
       productType={productType}
+      mode={editProductData ? 'edit' : 'view'}
     />
 
+    <ProductFormModal 
+      show={!!editProductData} 
+      handleClose={() => setEditProductData(null)} 
+      productData={editProductData}
+    />
 
 </>
 );

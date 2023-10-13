@@ -123,7 +123,8 @@ const ProductFormModal = ({ show, handleClose }) => {
     }
 
     // Step 3: Submit Images (Polymorphic relationship)
-    const imageableId = response.id;
+    console.log('Product ID:', productId);
+    const imageableId = productId;
     const imageableType = `App\\Models\\${productType.charAt(0).toUpperCase() + productType.slice(1)}`;
     
     console.log('Number of variant images to upload:', variantImages.length); // Check the number of images
@@ -191,6 +192,8 @@ const ProductFormModal = ({ show, handleClose }) => {
                 handleChange={handleChange} 
                 handleMainImageChange={handleMainImageChange} 
                 handleVariantImages={handleVariantImages} 
+                variantImages={variantImages}
+                setVariantImages={setVariantImages}
               />
             )}
     

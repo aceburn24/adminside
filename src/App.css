@@ -1,155 +1,196 @@
-/* Base styles */
-body {
-  font-family: 'Arial', sans-serif;
-  background-color: #f7f9fc; /* Softened background color */
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 600; /* Bold headers */
-}
-
-p, .card-text {
-  font-size: 1rem;
-  line-height: 1.6; /* Improved readability */
-  color: #4a4a4a; /* Muted text color */
-}
-
-a, .nav-link {
-  text-decoration: none;
-  color: #34495e; /* Adjusted link color */
-  transition: color 0.3s ease, transform 0.3s ease; /* Smooth transitions */
-}
-
-a:hover, .nav-link:hover {
-  color: #007bff;
-  transform: translateY(-2px); /* Subtle lift on hover */
-}
-
-/* Dashboard Layout */
-.App {
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.sidebar {
-  position: fixed;
-  z-index: 1000;
-  width: 300px;
-  background: #34495e; /* Adjusted sidebar color */
-  color: #ecf0f1; /* Contrasting text color */
-  padding: 30px 20px; /* Generous padding */
-  box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-  overflow-y: auto;
-  transition: all 0.3s ease; /* Smooth transition for any changes */
-}
-
-.sidebar .nav-link {
-  margin: 1px 0; /* Adjusted spacing */
-  padding: 10px 15px; /* Adjusted padding */
-  display: flex;
-  align-items: center;
-  border-radius: 5px;
-  transition: all 0.3s ease;
-}
-
-.sidebar .nav-link > * {
-  margin-right: 10px;
-}
-
-.sidebar .nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  transform: translateX(5px); /* Subtle shift on hover */
-}
-
-.sidebar .nav-link.active {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.cursor-pointer {
-  cursor: pointer;
-}
-
-.main-content {
-  flex-grow: 1;
-  padding: 40px;
-  background-color: #f7f9fc;
-  overflow-y: auto;
-  transition: all 0.3s ease;
-  margin-left: 300px;  /* Add this line to push the main content to the right */
-}
-
-/* Mobile Responsiveness Enhancements */
-@media (max-width: 992px) {
-  .main-content .card {
-      margin-bottom: 20px; /* Space between cards */
+  /* Base styles */
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f7f9fc; /* Softened background color */
   }
-}
 
-@media (max-width: 768px) {
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600; /* Bold headers */
+  }
+
+  p, .card-text {
+    font-size: 1rem;
+    line-height: 1.6; /* Improved readability */
+    color: #4a4a4a; /* Muted text color */
+  }
+
+  a, .nav-link {
+    text-decoration: none;
+    color: #34495e; /* Adjusted link color */
+    transition: color 0.3s ease, transform 0.3s ease; /* Smooth transitions */
+  }
+
+  a:hover, .nav-link:hover {
+    color: #007bff;
+    transform: translateY(-2px); /* Subtle lift on hover */
+  }
+
+  /* Dashboard Layout */
+  .App {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
   .sidebar {
-      width: 100%;
-      z-index: 1000;
-      padding: 15px 10px; /* Reduce padding for smaller screens */
+    position: fixed;
+    z-index: 1000;
+    width: 300px;
+    background: #34495e; /* Adjusted sidebar color */
+    color: #ecf0f1; /* Contrasting text color */
+    padding: 30px 20px; /* Generous padding */
+    box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    overflow-y: auto;
+    transition: all 0.3s ease; /* Smooth transition for any changes */
   }
 
   .sidebar .nav-link {
-      padding: 8px 10px; /* Adjust link padding */
+    margin: 1px 0; /* Adjusted spacing */
+    padding: 10px 15px; /* Adjusted padding */
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    transition: all 0.3s ease;
   }
 
-  .main-content h1, .main-content h2, .main-content h3 {
-      font-size: 1.2rem; /* Adjust header font sizes */
+  .sidebar .nav-link > * {
+    margin-right: 10px;
   }
 
-  .main-content p, .main-content .card-text {
-      font-size: 0.9rem; /* Adjust paragraph font sizes */
+  .sidebar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px); /* Subtle shift on hover */
+  }
+
+  .sidebar .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .cursor-pointer {
+    cursor: pointer;
   }
 
   .main-content {
-      padding: 20px; /* Reduce padding for main content */
-  }
-}
-
-@media (max-width: 576px) {
-  .main-content {
-      padding: 15px; /* Reduce padding for main content */
-  }
-
-  .main-content .card {
-      margin-bottom: 15px; /* Reduce space between cards */
+    flex-grow: 1;
+    padding: 40px;
+    background-color: #f7f9fc;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+    margin-left: 300px;  /* Add this line to push the main content to the right */
   }
 
-  .main-content .card-body {
-      padding: 15px; /* Reduce card body padding */
+  /* Mobile Responsiveness Enhancements */
+  @media (max-width: 992px) {
+    .main-content .card {
+        margin-bottom: 20px; /* Space between cards */
+    }
   }
 
-  .main-content .btn {
-      padding: 8px 10px; /* Adjust button padding */
-      font-size: 0.8rem; /* Adjust button font size */
+  @media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        z-index: 1000;
+        padding: 15px 10px; /* Reduce padding for smaller screens */
+    }
+
+    .sidebar .nav-link {
+        padding: 8px 10px; /* Adjust link padding */
+    }
+
+    .main-content h1, .main-content h2, .main-content h3 {
+        font-size: 1.2rem; /* Adjust header font sizes */
+    }
+
+    .main-content p, .main-content .card-text {
+        font-size: 0.9rem; /* Adjust paragraph font sizes */
+    }
+
+    .main-content {
+        padding: 20px; /* Reduce padding for main content */
+    }
   }
+
+  @media (max-width: 576px) {
+    .main-content {
+        padding: 15px; /* Reduce padding for main content */
+    }
+
+    .main-content .card {
+        margin-bottom: 15px; /* Reduce space between cards */
+    }
+
+    .main-content .card-body {
+        padding: 15px; /* Reduce card body padding */
+    }
+
+    .main-content .btn {
+        padding: 8px 10px; /* Adjust button padding */
+        font-size: 0.8rem; /* Adjust button font size */
+    }
+  }
+
+  /* Section Headers for Sidebar */
+  .sidebar-section-header {
+      background-color: rgba(0, 0, 0, 0.03); /* Light background for headers */
+      padding: 8px 15px; /* Padding for headers */
+      font-weight: bold; /* Bold text for headers */
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* Subtle border to separate headers from content */
+  }
+
+  /* Transitions and Hover Effects */
+  .fade-in {
+      animation: fadeIn 0.3s ease forwards;
+  }
+
+  @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+  }
+  /* Enhanced Sidebar */
+  .sidebar {
+    position: fixed;
+
+    padding-bottom: 100px; /* This will ensure that the fixed footer doesn't overlap the sidebar content */
+
+    min-height: 0; /* Ensure the sidebar doesn't force its parent to grow */
+    overflow-y: auto; /* Make sidebar scrollable */
+    
+  }
+
+  .sidebar-content {
+    overflow-y: auto; /* Allow scrolling for the list */
+    max-height: calc(100vh - 80px); /* Adjust this value based on the height of your footer */
+    padding-bottom: 20px; /* Space between the list and the footer */
 }
 
-/* Section Headers for Sidebar */
-.sidebar-section-header {
-    background-color: rgba(0, 0, 0, 0.03); /* Light background for headers */
-    padding: 8px 15px; /* Padding for headers */
-    font-weight: bold; /* Bold text for headers */
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* Subtle border to separate headers from content */
+/* Sidebar Footer Login Button */
+.sidebar-footer {
+  padding: 15px 0; /* Some vertical padding for spacing */
+  border-top: 1px solid rgba(255, 255, 255, 0.1); /* A subtle top border to separate from above content */
+  margin-top: 15px; /* A bit of margin for spacing */
 }
 
-/* Transitions and Hover Effects */
-.fade-in {
-    animation: fadeIn 0.3s ease forwards;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-/* Enhanced Sidebar */
-.sidebar {
-  min-height: 0; /* Ensure the sidebar doesn't force its parent to grow */
-  overflow-y: auto; /* Make sidebar scrollable */
+.sidebar-footer button {
   
+  background-color: #2c3e50; /* A bit darker than the sidebar */
+  color: #ecf0f1;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%; /* Make the button full width of the sidebar */
+  transition: background-color 0.3s ease;
 }
 
+.sidebar-footer button:hover {
+  background-color: #1a2533; /* Darken on hover */
+}
+
+/* The scrollable content area */
+.sidebar-scrollable-content {
+  overflow-y: auto;
+  max-height: calc(100vh - 100px); /* Adjust based on your footer height and desired padding */
+  padding-bottom: 60px; /* Space for the footer */
+}

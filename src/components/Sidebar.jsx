@@ -1,9 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaTachometerAlt, FaUsers, FaUserShield, FaUserFriends, FaUserLock, FaBox, FaInfoCircle, FaShippingFast, FaTag, FaMagic, FaCreditCard, FaTruckLoading, FaUndo, FaShip, FaChartLine, FaUserAlt, FaFileAlt, FaComments, FaBullhorn, FaRobot, FaCogs, FaChevronUp, FaChevronDown } from 'react-icons/fa';
 
 function Sidebar() {
     const [activeSection, setActiveSection] = useState('');
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            setIsAuthenticated(true);
+        }
+    }, []);
+
+    const handleLogin = () => {
+        // Logic for your login. For now, it just logs to console
+        console.log('Login clicked!');
+    };
+
+
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        setIsAuthenticated(false);
+    };
 
     return (
         <div className="sidebar bg-dark text-white h-100 py-4 px-3">
@@ -106,6 +126,16 @@ function Sidebar() {
                         General Settings
                     </Link>
                 </li>
+
+                       <div className="sidebar-footer">
+            {!isAuthenticated && (
+                <button onClick={handleLogin}>
+                    <FaUserAlt className="mr-2" />
+                    Login
+                </button>
+        )}
+    </div>
+
             </ul>
         </div>
     );
