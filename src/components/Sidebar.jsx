@@ -1,37 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaTachometerAlt, FaUsers, FaUserShield, FaUserFriends, FaUserLock, FaBox, FaInfoCircle, FaShippingFast, FaTag, FaMagic, FaCreditCard, FaTruckLoading, FaUndo, FaShip, FaChartLine, FaUserAlt, FaFileAlt, FaComments, FaBullhorn, FaRobot, FaCogs, FaChevronUp, FaChevronDown } from 'react-icons/fa';
+import { FaTachometerAlt, FaUsers, FaUserShield, FaUserFriends, FaEllipsisH, FaUserLock, FaBox, FaInfoCircle, FaShippingFast, FaTag, FaMagic, FaCreditCard, FaTruckLoading, FaUndo, FaShip, FaChartLine, FaUserAlt, FaFileAlt, FaComments, FaBullhorn, FaRobot, FaCogs, FaChevronUp, FaChevronDown } from 'react-icons/fa';
 
 function Sidebar() {
     const [activeSection, setActiveSection] = useState('');
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            setIsAuthenticated(true);
-        }
-    }, []);
-
-    const handleLogin = () => {
-        // Logic for your login. For now, it just logs to console
-        console.log('Login clicked!');
-    };
-
-
-
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        setIsAuthenticated(false);
-    };
+    const [isMoreOptionsOpen, setMoreOptionsOpen] = useState(false); // To control visibility of "More Options"
 
     return (
         <div className="sidebar bg-dark text-white h-100 py-4 px-3">
-            <div className="logo mb-5 text-center">
-                <img src="/logoheader.png" alt="Website Logo" className="img-fluid mb-3" />
-                <h4 className="mt-2 font-weight-bold">Admin Dashboard</h4>
-            </div>
-            <ul className="nav flex-column mt-4">
+                        <div className="sidebar-content">
+                <div className="logo mb-5 text-center">
+                    <img src="/logoheader.png" alt="Website Logo" className="img-fluid mb-3" />
+                    <h4 className="mt-2 font-weight-bold">Admin Dashboard</h4>
+                </div>
+                <ul className="nav flex-column mt-4">
                 <li className="nav-item py-2 mb-3">
                     <Link to="/dashboard" className="nav-link text-white d-flex align-items-center">
                         <FaTachometerAlt className="mr-2" />
@@ -120,23 +102,22 @@ function Sidebar() {
                         Settings & Configuration
                     </Link>
                 </Section>
-                <li className="nav-item py-2 mb-3">
-                    <Link to="/general-settings" className="nav-link text-white d-flex align-items-center">
-                        <FaCogs className="mr-2" />
-                        General Settings
-                    </Link>
-                </li>
-
-                       <div className="sidebar-footer">
-            {!isAuthenticated && (
-                <button onClick={handleLogin}>
+                </ul>
+                </div>
+                <div className="sidebar-footer d-flex justify-content-between">
+                <button onClick={() => window.location.href='/admin-settings'} title="Admin">
                     <FaUserAlt className="mr-2" />
-                    Login
                 </button>
-        )}
-    </div>
-
-            </ul>
+                <button onClick={() => setMoreOptionsOpen(!isMoreOptionsOpen)} title="More Options">
+                    <FaEllipsisH />
+                </button>
+                {isMoreOptionsOpen && (
+                    <div className="more-options-dropdown">
+                        <Link to="/general-settings">General Settings</Link>
+                        <Link to="/logout">Logout</Link>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
