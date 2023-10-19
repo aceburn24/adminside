@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaTachometerAlt, FaUsers, FaUserShield, FaUserFriends, FaEllipsisH, FaUserLock, FaBox, FaInfoCircle, FaShippingFast, FaTag, FaMagic, FaCreditCard, FaTruckLoading, FaUndo, FaShip, FaChartLine, FaUserAlt, FaFileAlt, FaComments, FaBullhorn, FaRobot, FaCogs, FaChevronUp, FaChevronDown } from 'react-icons/fa';
+import { FaCog, FaSignOutAlt, FaTachometerAlt, FaUsers, FaUserShield, FaUserFriends, FaEllipsisH, FaUserLock, FaBox, FaInfoCircle, FaShippingFast, FaTag, FaMagic, FaCreditCard, FaTruckLoading, FaUndo, FaShip, FaChartLine, FaUserAlt, FaFileAlt, FaComments, FaBullhorn, FaRobot, FaCogs, FaChevronUp, FaChevronDown } from 'react-icons/fa';
 
 function Sidebar() {
     const [activeSection, setActiveSection] = useState('');
     const [isMoreOptionsOpen, setMoreOptionsOpen] = useState(false); // To control visibility of "More Options"
 
+    
     return (
         <div className="sidebar bg-dark text-white h-100 py-4 px-3">
                         <div className="sidebar-content">
@@ -104,17 +105,29 @@ function Sidebar() {
                 </Section>
                 </ul>
                 </div>
-                <div className="sidebar-footer d-flex justify-content-between">
-                <button onClick={() => window.location.href='/admin-settings'} title="Admin">
-                    <FaUserAlt className="mr-2" />
+                <div className="sidebar-footer d-flex justify-content-between align-items-center p-3">
+                <button
+                    onClick={() => window.location.href='/admin-settings'}
+                    title="Admin"
+                    className="btn btn-flat"
+                >
+                    <FaUserAlt className="icon" />
                 </button>
-                <button onClick={() => setMoreOptionsOpen(!isMoreOptionsOpen)} title="More Options">
-                    <FaEllipsisH />
+                <button
+                    onClick={() => setMoreOptionsOpen(!isMoreOptionsOpen)}
+                    title="More Options"
+                    className="btn btn-flat"
+                >
+                    <FaEllipsisH className="icon" />
                 </button>
                 {isMoreOptionsOpen && (
-                    <div className="more-options-dropdown">
-                        <Link to="/general-settings">General Settings</Link>
-                        <Link to="/logout">Logout</Link>
+                    <div className="more-options-dropdown rounded shadow p-2 bg-white">
+                        <Link to="/general-settings" className="d-flex align-items-center p-2 text-dark">
+                            <FaCog className="icon" /> General Settings
+                        </Link>
+                        <Link to="/logout" className="d-flex align-items-center p-2 text-dark">
+                            <FaSignOutAlt className="icon" /> Logout
+                        </Link>
                     </div>
                 )}
             </div>

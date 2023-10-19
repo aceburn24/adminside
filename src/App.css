@@ -65,7 +65,6 @@ a:hover, .nav-link:hover {
 .sidebar .nav-link > * {
   margin-right: 10px;
   transition: background-color 0.3s ease, transform 0.3s ease, color 0.3s ease;
-  
 }
 
 .sidebar .nav-link .mr-2 {
@@ -98,50 +97,50 @@ a:hover, .nav-link:hover {
 
 @media (max-width: 992px) {
   .main-content .card {
-      margin-bottom: 20px;
+    margin-bottom: 20px;
   }
 }
 
 @media (max-width: 768px) {
   .sidebar {
-      width: 100%;
-      z-index: 1000;
-      padding: 15px 10px;
+    width: 100%;
+    z-index: 1000;
+    padding: 15px 10px;
   }
 
   .sidebar .nav-link {
-      padding: 8px 10px;
+    padding: 8px 10px;
   }
 
   .main-content h1, .main-content h2, .main-content h3 {
-      font-size: 1.2rem;
+    font-size: 1.2rem;
   }
 
   .main-content p, .main-content .card-text {
-      font-size: 0.9rem;
+    font-size: 0.9rem;
   }
 
   .main-content {
-      padding: 20px;
+    padding: 20px;
   }
 }
 
 @media (max-width: 576px) {
   .main-content {
-      padding: 15px;
+    padding: 15px;
   }
 
   .main-content .card {
-      margin-bottom: 15px;
+    margin-bottom: 15px;
   }
 
   .main-content .card-body {
-      padding: 15px;
+    padding: 15px;
   }
 
   .main-content .btn {
-      padding: 8px 10px;
-      font-size: 0.8rem;
+    padding: 8px 10px;
+    font-size: 0.8rem;
   }
 }
 
@@ -172,19 +171,44 @@ a:hover, .nav-link:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
+  padding: 15px 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+
 }
 
 /* Footer Enhancements */
-.sidebar-footer button {
+.sidebar-footer button.btn-flat {
+  background-color: transparent;
+  color: #ecf0f1;
+  border: none;
+  padding: 10px;
   transition: background-color 0.3s ease, transform 0.3s ease;
-  border-radius: 50%; /* Rounded buttons */
-  width: 40px;
-  height: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: auto;
+  height: auto;
+  border-radius: 4px; /* Slightly rounded corners */
+}
+
+.sidebar-footer button.btn-flat:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+
+}
+
+.sidebar-footer button .icon {
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
+
+}
+
+.sidebar-footer button .fa {
+  color: #ecf0f1; /* Setting a specific color for icons */
+  
+}
+
+.sidebar-footer button:focus {
+  outline: none; /* remove default outline */
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25); /* custom focus ring */
 }
 
 .sidebar-footer button:active {
@@ -195,23 +219,52 @@ a:hover, .nav-link:hover {
 .more-options-dropdown {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
   padding: 8px 0; /* Padding adjustment */
+  background-color: #ffffff; /* Added background color */
+  border: 1px solid #ddd; /* Added subtle border */
+  border-radius: 8px; /* Added border radius */
+  overflow: hidden; /* Ensures the border radius is applied to all corners */
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  transform: translateY(-10px);
+}
+
+/* when dropdown is visible */
+.is-more-options-open .more-options-dropdown {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .more-options-dropdown a {
   font-weight: 500; /* Semi-bold font weight */
+  padding: 10px 15px; /* Added padding */
 }
 
-.sidebar-footer button:hover {
-  background-color: #1a2533;
+.more-options-dropdown a:hover {
+  background-color: #ecf0f1;
+  color: #2c3e50;
 }
 
-/* Logo styling */
-.logo img {
-  border-radius: 50%; /* Rounded logo */
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+/* Adding a subtle transition to link colors and background */
+.sidebar .nav-link {
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.logo h4 {
-  letter-spacing: 1px;
-  color: #f8f9fa; /* Bootstrap's light color for contrast */
+/* Changing background color and text color on hover */
+.sidebar .nav-link:hover {
+  background-color: #007bff;
+  color: #ffffff;
+}
+
+@media (max-width: 576px) {
+  .sidebar-footer button {
+    width: 35px; /* Adjusted button size */
+    height: 35px;
+  }
+
+  .more-options-dropdown {
+    padding: 5px 0; /* Adjusted padding */
+  }
+
+  .more-options-dropdown a {
+    padding: 8px 12px; /* Adjusted padding */
+  }
 }
